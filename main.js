@@ -1,43 +1,102 @@
 
+
+// ========== session 10 ============
+const http = require('http')
+
+let users = [
+    { id: 1, name: "ahmed" , email:"ahmed@gmail.com" , job:"pilot"},
+    { id: 2, name: "sara" , email:"sara@gmail.com" , job:"teacher"},
+    { id: 3, name: "ali" , email:"ali@gmail.com" , job:"michanic"},
+    { id: 4, name: "noura" , email:"noura@gmail.com" , job:"doctor"},
+];
+
+const server = http.createServer((req, res) => {
+    const {url , method} = req
+
+    if (url === '/users' && method === 'GET') {
+        res.end(JSON.stringify(users))
+    }
+
+    else if (url === '/users' && method === 'POST') {
+        req.on('data', (user) => {
+            let newUser = JSON.parse(user)
+            users.push(newUser)
+            res.statusCode=201
+            res.end("user added")
+        })
+    }
+
+    else if (url === '/users' && method === 'DELETE') {
+        req.on('data', (user) => {
+            const deletedUser = JSON.parse(user);
+            const userId = deletedUser.id; 
+            users = users.filter(user => user.id !== userId);
+            res.end("user deleted");
+        });
+    }
+
+    else {
+        res.end("hello \n i did it ");
+    }
+});
+
+server.listen(3000, () => {
+    console.log('server is running');
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // ========== session 9 ============
 
 // ===> Q1
-let fs = require('fs')
+// let fs = require('fs')
 
-fs.writeFileSync('notes.txt', 'hello, node.js')
-console.log('file created.')
+// fs.writeFileSync('notes.txt', 'hello, node.js')
+// console.log('file created.')
 
-fs.appendFileSync('notes.txt', ' learning fs module')
-console.log('text appended.')
+// fs.appendFileSync('notes.txt', ' learning fs module')
+// console.log('text appended.')
 
-let data = fs.readFileSync('notes.txt')
-console.log('file content : ' + data)
+// let data = fs.readFileSync('notes.txt')
+// console.log('file content : ' + data)
 
-fs.unlinkSync('notes.txt')
-console.log('file deleted.')
+// fs.unlinkSync('notes.txt')
+// console.log('file deleted.')
 
 
 
 // ===>Q2
-let os = require('os')
-console.log('architecture: ' + os.arch())
-console.log('platform: ' + os.platform())
-console.log('total memory: ' + (os.totalmem()))
-console.log('hostname: ' + os.hostname())
-console.log('uptime: ' + os.uptime())
+// let os = require('os')
+// console.log('architecture: ' + os.arch())
+// console.log('platform: ' + os.platform())
+// console.log('total memory: ' + (os.totalmem()))
+// console.log('hostname: ' + os.hostname())
+// console.log('uptime: ' + os.uptime())
 
 
 
 // ===>Q3
-let http = require('http')
+// let http = require('http')
 
-let server = http.createServer((req, res) => {
-    res.end('i did it')
-})
+// let server = http.createServer((req, res) => {
+//     res.end('i did it')
+// })
 
-server.listen(3000, () => {
-    console.log('server is running')
-})
+// server.listen(3000, () => {
+//     console.log('server is running')
+// })
 
 
 
