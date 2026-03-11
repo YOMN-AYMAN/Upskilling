@@ -1,48 +1,133 @@
 
 
-// ========== session 10 ============
-const http = require('http')
+// ========== session 12 ============
+const express = require('express');
+const path = require('path');
+const app = express();
+
+app.use(express.json());
+app.use(express.static('public')); 
+app.use((req, res, next) => {
+    console.log(` Method: ${req.method} \n URL: ${req.url}`);
+    next(); 
+});
 
 let users = [
-    { id: 1, name: "ahmed" , email:"ahmed@gmail.com" , job:"pilot"},
-    { id: 2, name: "sara" , email:"sara@gmail.com" , job:"teacher"},
-    { id: 3, name: "ali" , email:"ali@gmail.com" , job:"michanic"},
-    { id: 4, name: "noura" , email:"noura@gmail.com" , job:"doctor"},
+    { id: 1, name: 'ali' },
+    { id: 2, name: 'ahmed' },
+    { id: 3, name: 'sara' }
 ];
 
-const server = http.createServer((req, res) => {
-    const {url , method} = req
+const findUserIndex = (id) => users.findIndex(u => u.id === Number(id));
 
-    if (url === '/users' && method === 'GET') {
-        res.end(JSON.stringify(users))
-    }
-
-    else if (url === '/users' && method === 'POST') {
-        req.on('data', (user) => {
-            let newUser = JSON.parse(user)
-            users.push(newUser)
-            res.statusCode=201
-            res.end("user added")
-        })
-    }
-
-    else if (url === '/users' && method === 'DELETE') {
-        req.on('data', (user) => {
-            const deletedUser = JSON.parse(user);
-            const userId = deletedUser.id; 
-            users = users.filter(user => user.id !== userId);
-            res.end("user deleted");
-        });
-    }
-
-    else {
-        res.end("hello \n i did it ");
-    }
+app.get('/home', (req, res) => {
+    res.sendFile(path.resolve('./index.html'));
 });
 
-server.listen(3000, () => {
-    console.log('server is running');
+app.get('/users', (req, res) => {
+    const { name } = req.query;
+    if (name) {
+        const filteredUsers = users.filter(u => u.name.toLowerCase() === name.toLowerCase());
+        if (filteredUsers.length === 0) {
+            return res.json({ message: `${name} not found` });
+        }
+        return res.json(filteredUsers);
+    }
+    res.json(users);
 });
+
+app.get('/users/:id', (req, res) => {
+    const id = Number(req.params.id);
+    const user = users.find(u => u.id === id);
+    if (!user) {
+        return res.json({ message: "User not found" });
+    }
+    res.json(user);
+});
+
+app.post('/users', (req, res) => {
+    const {name} = req.body
+    const newId = users.length + 1 
+    const newUser = { id: newId, name };
+    users.push(newUser);
+    res.json({ message: "User added"});
+});
+
+
+app.put('/users/:id', (req, res) => {
+    const index = findUserIndex(req.params.id);
+    if (index === -1) return res.json({ message: "User not found" })
+    users[index].name = req.body.name
+    res.json({ message: "User updated"});
+});
+
+app.delete('/users/:id', (req, res) => {
+    const index = findUserIndex(req.params.id);
+    if (index === -1) return res.json({ message: "User not found" });
+    users.splice(index, 1);
+    res.json({ message: "User deleted" });
+});
+
+app.use((req, res) => {
+    res.send('<h1>404 Not Found</h1>');
+});
+
+app.listen(3000, () => {
+    console.log('Server is running');
+});
+
+
+
+
+
+
+
+
+
+
+// ========== session 10 ============
+// const http = require('http')
+
+// let users = [
+//     { id: 1, name: "ahmed" , email:"ahmed@gmail.com" , job:"pilot"},
+//     { id: 2, name: "sara" , email:"sara@gmail.com" , job:"teacher"},
+//     { id: 3, name: "ali" , email:"ali@gmail.com" , job:"michanic"},
+//     { id: 4, name: "noura" , email:"noura@gmail.com" , job:"doctor"},
+// ];
+
+// const server = http.createServer((req, res) => {
+//     const {url , method} = req
+
+//     if (url === '/users' && method === 'GET') {
+//         res.end(JSON.stringify(users))
+//     }
+
+//     else if (url === '/users' && method === 'POST') {
+//         req.on('data', (user) => {
+//             let newUser = JSON.parse(user)
+//             users.push(newUser)
+//             res.statusCode=201
+//             res.end("user added")
+//         })
+//     }
+
+//     else if (url === '/users' && method === 'DELETE') {
+//         req.on('data', (user) => {
+//             const deletedUser = JSON.parse(user);
+//             const userId = deletedUser.id; 
+//             users = users.filter(user => user.id !== userId);
+//             res.end("user deleted");
+//         });
+//     }
+
+//     else {
+//         res.end("hello \n i did it ");
+//     }
+// });
+
+// server.listen(3000, () => {
+//     console.log('server is running');
+// });
 
 
 
